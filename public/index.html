@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Healthy Paws — ветеринарная клиника</title>
+  <meta name="description" content="Ветеринарная клиника Healthy Paws: приём, диагностика, вакцинация и груминг для собак и кошек.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a href="#home" class="logo">Healthy<span>Paws</span></a>
+ 
+      <nav class="nav" id="nav" aria-label="Основная навигация">
+        <a href="#home" class="nav__link nav__link--active">Главная</a>
+        <a href="#services" class="nav__link">Услуги</a>
+        <a href="#doctors" class="nav__link">Врачи</a>
+        <a href="#reviews" class="nav__link">Отзывы</a>
+        <a href="#booking" class="nav__link">Контакты</a>
+        <a href="#booking" class="btn btn--primary nav__cta">Записаться онлайн ›</a>
+      </nav>
+ 
+      <button class="burger" id="burger" aria-label="Открыть меню" aria-expanded="false" aria-controls="nav">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+ 
+  <main>
+    <section class="hero" id="home">
+      <div class="container">
+        <h1 class="hero__title">Круглосуточная ветеринарная клиника</h1>
+        <p class="hero__script">лечим с любовью</p>
+ 
+        <div class="hero__grid">
+          <div class="hero__photo">
+            <img src="img/dogs.png" alt="Две собаки — шоколадные пудели" class="hero__img" loading="eager">
+          </div>
+ 
+          <div class="hero__side">
+            <div class="rating">
+              <p class="rating__title">Нам доверяют владельцы питомцев</p>
+              <div class="rating__row">
+                <span class="rating__star">★</span>
+                <strong>4.9</strong>
+                <span class="rating__count">(2000 отзывов)</span>
+              </div>
+              <div class="avatars" aria-hidden="true">
+                <span>АК</span><span>МС</span><span>ЕП</span><span>ДВ</span>
+              </div>
+            </div>
+ 
+            <div class="hero__text">
+              <p class="eyebrow">Что мы делаем</p>
+              <p class="hero__desc">Бережно лечим, вакцинируем и обследуем животных любого характера — от хомяков до лабрадоров.</p>
+              <div class="hero__btns">
+                <a href="#services" class="btn btn--primary">Наши услуги ›</a>
+                <a href="#doctors" class="btn btn--outline">Наши врачи ›</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+ 
+    <section class="section" id="services">
+      <div class="container">
+        <p class="eyebrow">Услуги</p>
+        <h2 class="section__title">Всё для здоровья питомца</h2>
+        <div class="cards" id="services-list"></div>
+      </div>
+    </section>
+ 
+    <section class="section section--alt" id="doctors">
+      <div class="container">
+        <p class="eyebrow">Команда</p>
+        <h2 class="section__title">Наши врачи</h2>
+        <div class="cards cards--doctors" id="doctors-list"></div>
+      </div>
+    </section>
+ 
+    <section class="section" id="reviews">
+      <div class="container">
+        <p class="eyebrow">Отзывы</p>
+        <h2 class="section__title">Говорят наши клиенты</h2>
+        <div class="cards" id="reviews-list"></div>
+      </div>
+    </section>
+ 
+    <section class="section section--alt" id="booking">
+      <div class="container booking">
+        <div class="booking__info">
+          <p class="eyebrow">Запись на приём</p>
+          <h2 class="section__title">Запишитесь онлайн за минуту</h2>
+          <p class="muted">Мы перезвоним, чтобы подтвердить время визита.</p>
+          <ul class="contacts">
+            <li><span class="contacts__label">Адрес</span>г. Минск, пр. Независимости, 95</li>
+            <li><span class="contacts__label">Телефон</span><a href="tel:+375171234567">+375 (17) 123-45-67</a></li>
+          </ul>
+        </div>
+ 
+        <form class="form" id="booking-form" novalidate>
+          <div class="field">
+            <label for="name">Ваше имя</label>
+            <input type="text" id="name" name="name" placeholder="Анна" autocomplete="name">
+            <small class="error"></small>
+          </div>
+          <div class="field">
+            <label for="phone">Телефон</label>
+            <input type="tel" id="phone" name="phone" placeholder="+375 (29) 123-45-67" autocomplete="tel">
+            <small class="error"></small>
+          </div>
+          <div class="field">
+            <label for="pet">Питомец</label>
+            <select id="pet" name="pet">
+              <option value="">Выберите...</option>
+              <option>Собака</option>
+              <option>Кошка</option>
+              <option>Грызун</option>
+              <option>Другое</option>
+            </select>
+            <small class="error"></small>
+          </div>
+          <div class="field">
+            <label for="service">Услуга</label>
+            <select id="service" name="service"><option value="">Выберите...</option></select>
+            <small class="error"></small>
+          </div>
+          <div class="field">
+            <label for="doctor">Врач</label>
+            <select id="doctor" name="doctor"><option value="">Выберите...</option></select>
+            <small class="error"></small>
+          </div>
+          <div class="field">
+            <label for="date">Дата визита</label>
+            <input type="date" id="date" name="date">
+            <small class="error"></small>
+          </div>
+          <button type="submit" class="btn btn--primary btn--block">Записаться</button>
+          <p class="form__status" id="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+ 
+  <footer class="footer">
+    <div class="container footer__inner">
+      <span class="logo logo--light">Healthy<span>Paws</span></span>
+      <small>© 2026 Healthy Paws. Все права защищены.</small>
+    </div>
+  </footer>
+ 
+  <script src="script.js"></script>
+</body>
+</html>
