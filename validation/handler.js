@@ -1,4 +1,5 @@
-class Handler {
+//базовый класс
+  class Handler {
   setNext(handler) {
     this.next = handler;
     return handler;
@@ -10,11 +11,4 @@ class Handler {
   }
 }
 
-class RequiredFieldsHandler extends Handler {
-  async handle(data) {
-    for (const field of ['full_name', 'phone', 'email', 'password']) {
-      if (!data[field]) throw new HttpError(400, 'Все поля обязательны для заполнения');
-    }
-    return super.handle(data);
-  }
-}
+module.exports = Handler;

@@ -10,12 +10,10 @@ const app = express();
 const PORT = 3000;
 const SPECIES = ['dog', 'cat', 'rodent', 'bird', 'other'];
 
-class HttpError extends Error {
-  constructor(status, message) {
-    super(message);
-    this.status = status;
-  }
-}
+const { HttpError } = require('./errors');
+const registrationChain = require('./validation/registrationChain');
+const loginChain = require('./validation/loginChain');
+
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -75,22 +73,7 @@ app.get('/api/specialists', async (req, res) => {
 
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { full_name, phone, email, password } = req.body;
-
-    if (!full_name || !phone || !email || !password) {
-      return res.status(400).json({ error: 'Все поля обязательны для заполнения' });
-    }
-
-    const cleanPhone = String(phone).replace(/[^\d+]/g, '');
-    if (!/^\+375\d{9}$/.test(cleanPhone)) {
-      return res.status(400).json({ error: 'Телефон должен быть в формате +375XXXXXXXXX' });
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim())) {
-      return res.status(400).json({ error: 'Некорректный email' });
-    }
-    if (String(password).length < 6) {
-      return res.status(400).json({ error: 'Пароль должен содержать минимум 6 символов' });
-    }
+    const { full_name, phone, email, password } = await registrationChain.handle(req.body);
 
     const passwordHash = await bcrypt.hash(String(password), 10);
 
@@ -98,7 +81,7 @@ app.post('/api/auth/register', async (req, res) => {
       `INSERT INTO users (full_name, phone, email, password_hash)
        VALUES ($1, $2, $3, $4)
        RETURNING id, full_name, role`,
-      [String(full_name).trim(), cleanPhone, String(email).trim(), passwordHash]
+      [String(full_name).trim(), phone, email, passwordHash]
     );
 
     const newUser = result.rows[0];
@@ -108,6 +91,9 @@ app.post('/api/auth/register', async (req, res) => {
     if (err.code === '23505') {
       return res.status(409).json({ error: 'Этот телефон или email уже зарегистрирован' });
     }
+    if (err instanceof HttpError) {
+      return res.status(err.status).json({ error: err.message });
+    }
     console.error(err);
     res.status(500).json({ error: 'Внутренняя ошибка сервера' });
   }
@@ -115,14 +101,9 @@ app.post('/api/auth/register', async (req, res) => {
 
 app.post('/api/auth/login', async (req, res) => {
   try {
-    const { phone, password } = req.body;
-    const cleanPhone = String(phone || '').replace(/[^\d+]/g, '');
+    const { phone, password } = await loginChain.handle(req.body);
 
-    if (!cleanPhone || !password) {
-      return res.status(400).json({ error: 'Телефон и пароль обязательны' });
-    }
-
-    const result = await pool.query('SELECT * FROM users WHERE phone = $1', [cleanPhone]);
+    const result = await pool.query('SELECT * FROM users WHERE phone = $1', [phone]);
     const user = result.rows[0];
 
     if (!user || !(await bcrypt.compare(String(password), user.password_hash))) {
@@ -135,6 +116,9 @@ app.post('/api/auth/login', async (req, res) => {
       user: { id: user.id, full_name: user.full_name, role: user.role }
     });
   } catch (err) {
+    if (err instanceof HttpError) {
+      return res.status(err.status).json({ error: err.message });
+    }
     console.error(err);
     res.status(500).json({ error: 'Ошибка сервера при входе' });
   }
@@ -287,7 +271,7 @@ app.post('/api/me/appointments', requireAuth, async (req, res) => {
     await client.query('COMMIT');
     res.status(201).json({ message: 'Вы успешно записаны', appointment_id: appointmentId });
   } catch (err) {
-    if (client) await client.query('ROLLBACK').catch(() => {});
+    if (client) await client.query('ROLLBACK').catch(() => { });
     if (err instanceof HttpError) {
       return res.status(err.status).json({ error: err.message });
     }
