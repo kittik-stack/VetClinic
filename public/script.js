@@ -1,40 +1,45 @@
 'use strict';
 
 const $ = (sel) => document.querySelector(sel);
+
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => (
+  { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+));
  
-// SVG-заглушка, если фото не загрузилось
 const FALLBACK_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="#dfe6f3"/><text x="50%" y="52%" font-size="96" text-anchor="middle">🐾</text></svg>'
 );
- 
-/* ===== ДАННЫЕ (редактируйте только здесь) ===== */
-// const services = [
-//   { id: 1, title: 'Осмотр и консультация', text: 'Первичный и повторный приём, составление плана лечения.', price: 'от 45 BYN' },
-//   { id: 2, title: 'Вакцинация', text: 'Комплексные прививки для собак и кошек, ветпаспорт.', price: 'от 60 BYN' },
-//   { id: 3, title: 'Диагностика и анализы', text: 'УЗИ, рентген, лаборатория — результаты в день обращения.', price: 'от 55 BYN' },
-//   { id: 4, title: 'Стоматология', text: 'Чистка зубов, лечение дёсен, удаление камня.', price: 'от 120 BYN' },
-//   { id: 5, title: 'Хирургия', text: 'Плановые и экстренные операции под безопасным наркозом.', price: 'от 250 BYN' },
-//   { id: 6, title: 'Бережный груминг', text: 'Мытьё, расчёсывание и стрижка животных любого характера.', price: 'от 70 BYN' }
-// ];
- 
+const initials = (name) =>
+  name.split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+
+const avatarHtml = (letters) => `
+  <div class="doctor__ph"><span class="doctor__avatar" aria-hidden="true">${letters}</span></div>`;
+
 async function getServices() {
   try{
     const res = await fetch('/api/services');
     if(!res.ok){ throw new Error(`Ошибка http: ${res.status}`);}
 
-    const service = await res.json();
-    return service;
+    const services = await res.json();
+    return services;
   }catch(error){
     console.error('Не удалось загрузить услуги:', error);
     return [];
   }
 }
 
-const doctors = [
-  { id: 1, name: 'Анна Смирнова', role: 'Терапевт, хирург', photo: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&q=80' },
-  { id: 2, name: 'Иван Петров', role: 'Диагност (УЗИ)', photo: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&q=80' },
-  { id: 3, name: 'Елена Смит', role: 'Стоматолог', photo: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=400&q=80' }
-];
+async function getDoctors() {
+  try{
+    const res = await fetch('/api/specialists');
+    if(!res.ok){ throw new Error(`Ошибка http: ${res.status}`);}
+
+    const doctors = await res.json();
+    return doctors;
+  }catch(error){
+    console.error('Не удалось загрузить врачей:', error);
+    return [];
+  }
+}
  
 const reviews = [
   { id: 1, author: 'Екатерина, хозяйка корги', rating: 5, text: 'Врачи очень внимательные. Пёс совсем не нервничал, всё объяснили простым языком.' },
@@ -50,7 +55,6 @@ function attachImageFallback() {
   });
 }
  
-/* ===== РЕНДЕР ===== */
 function renderServices(services) {
   const list = $(`#services-list`);
   if(!list) return;
@@ -63,18 +67,35 @@ function renderServices(services) {
   list.innerHTML = services.map((s) => `
     <article class="card">
       <h3 class="card__title">${s.name}</h3>
-      <p class="card__text">${s.description}</p>
-      <p class="card__price">${s.price} BYN</p>
+      <p class="card__text">${s.description || ""}</p>
+      <p class="card__price">${Number(s.price)} BYN</p>
     </article>`).join('');
 }
  
-function renderDoctors() {
-  $('#doctors-list').innerHTML = doctors.map((d) => `
+function renderDoctors(doctors) {
+  const list = $('#doctors-list');
+  if (!list) return;
+
+  if (doctors.length === 0) {
+    list.innerHTML = '<p>Информация о врачах временно недоступна.</p>';
+    return;
+  }
+
+  list.innerHTML = doctors.map((d) => `
     <article class="card">
-      <img class="doctor__photo" src="${d.photo}" alt="${d.name}" loading="lazy">
-      <p class="doctor__role">${d.role}</p>
-      <h3 class="card__title">${d.name}</h3>
+      ${d.photo_url
+        ? `<img class="doctor__photo" src="${d.photo_url}" alt="${d.full_name}"
+                data-initials="${initials(d.full_name)}" loading="lazy">`
+        : avatarHtml(initials(d.full_name))}
+      <p class="doctor__role">${d.specialization}</p>
+      <h3 class="card__title">${d.full_name}</h3>
     </article>`).join('');
+
+    list.querySelectorAll('.doctor__photo').forEach((img) => {
+    img.addEventListener('error', () => {
+      img.outerHTML = avatarHtml(img.dataset.initials);
+    }, { once: true });
+  });
 }
  
 function renderReviews() {
@@ -86,14 +107,35 @@ function renderReviews() {
     </article>`).join('');
 }
  
-function fillSelects(services) {
+function fillSelects(services, doctors) {
   $('#service').insertAdjacentHTML('beforeend',
-    services.map((s) => `<option value="${s.name}">${s.name}</option>`).join(''));
+    services.map((s) => `<option value="${s.id}">${s.name}</option>`).join(''));
   $('#doctor').insertAdjacentHTML('beforeend',
-    doctors.map((d) => `<option value="${d.name}">${d.name} — ${d.role}</option>`).join(''));
+    doctors.map((d) => `<option value="${d.id}">${d.full_name} — ${d.specialization}</option>`).join(''));
 }
  
-/* ===== БУРГЕР-МЕНЮ ===== */
+async function checkAuth() {
+  const authNav = $('#auth-nav');
+  if (!authNav) return;
+
+  try {
+    const res = await fetch('/api/auth/me');
+    const { user } = await res.json();
+    if (!user) return;
+
+    authNav.innerHTML = `
+      <a href="account.html" class="nav__user">${esc(user.full_name)}</a>
+      <button id="logout-btn-main" class="btn btn--outline">Выйти</button>`;
+
+    $('#logout-btn-main').addEventListener('click', async () => {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.reload();
+    });
+  } catch (error) {
+    console.error('Ошибка проверки авторизации:', error);
+  }
+}
+
 function initBurger() {
   const burger = $('#burger');
   const nav = $('#nav');
@@ -108,7 +150,6 @@ function initBurger() {
   nav.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => toggle(false)));
 }
  
-/* ===== ПЛАВНЫЙ СКРОЛЛ ===== */
 function initSmoothScroll() {
   const offset = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h'), 10) || 72;
  
@@ -123,13 +164,11 @@ function initSmoothScroll() {
   });
 }
  
-/* ===== ФОРМА ===== */
 function initForm() {
   const form = $('#booking-form');
   const status = $('#form-status');
   const dateInput = $('#date');
  
-  // Минимальная дата — сегодня
   const today = new Date();
   today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
   const todayStr = today.toISOString().split('T')[0];
@@ -176,18 +215,16 @@ function initForm() {
   });
 }
  
-/* ===== ЗАПУСК ===== */
 document.addEventListener('DOMContentLoaded', async () => {
-  const servicesData = await getServices();
-
-  renderServices(servicesData);
-
-  fillSelects(servicesData);
-
-  renderDoctors();
   renderReviews();
   initBurger();
   initSmoothScroll();
   initForm();
   attachImageFallback();
+  checkAuth();
+
+  const [servicesData, doctorsData] = await Promise.all([getServices(), getDoctors()]);
+  renderServices(servicesData);
+  renderDoctors(doctorsData);
+  fillSelects(servicesData, doctorsData);
 });

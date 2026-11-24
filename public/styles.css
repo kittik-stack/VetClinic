@@ -209,3 +209,17 @@ ul { list-style: none; }
   .cards--doctors { grid-template-columns: repeat(3, 1fr); }
   .booking { grid-template-columns: 1fr 1.2fr; align-items: start; }
 }
+
+.doctor__ph {
+  aspect-ratio: 1; border-radius: var(--r-md); background: var(--c-border);
+  display: grid; place-items: center;       /* центр по горизонтали и вертикали */
+  margin-bottom: var(--sp-2);
+}
+.doctor__avatar {
+  width: 96px; height: 96px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--c-primary); color: #fff;
+  font-size: 32px; font-weight: 800;
+}
+
+.nav__user { margin-right: var(--sp-2); font-weight: 600; }

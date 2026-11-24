@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Личный кабинет — Healthy Paws</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="account.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a href="/" class="logo">Healthy<span>Paws</span></a>
+      <a href="/" class="btn btn--outline">На главную</a>
+    </div>
+  </header>
+
+  <main class="container account">
+
+    <section class="auth" id="guest" hidden>
+      <div class="auth__intro">
+        <p class="eyebrow">Личный кабинет</p>
+        <h1 class="auth__title">Питомцы и визиты в одном месте</h1>
+        <p class="auth__script">мы рады вас видеть</p>
+        <p class="auth__lead">Записывайтесь на приём онлайн, добавляйте питомцев и смотрите историю посещений.</p>
+      </div>
+
+      <div class="auth__card">
+        <div class="tabs">
+          <button class="tabs__btn is-active" type="button" data-tab="login">Вход</button>
+          <button class="tabs__btn" type="button" data-tab="register">Регистрация</button>
+        </div>
+
+        <form class="stack" id="login-form" novalidate>
+          <div class="field">
+            <label for="login-phone">Телефон</label>
+            <input id="login-phone" name="phone" type="tel" inputmode="tel" placeholder="+375 (29) 123-45-67" autocomplete="tel">
+          </div>
+          <div class="field">
+            <label for="login-password">Пароль</label>
+            <input id="login-password" name="password" type="password" autocomplete="current-password">
+          </div>
+          <p class="msg" role="alert"></p>
+          <button class="btn btn--primary btn--lg btn--block" type="submit">Войти</button>
+        </form>
+
+        <form class="stack" id="register-form" novalidate hidden>
+          <div class="field">
+            <label for="reg-name">Ваше имя</label>
+            <input id="reg-name" name="full_name" type="text" placeholder="Анна Иванова" autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="reg-phone">Телефон</label>
+            <input id="reg-phone" name="phone" type="tel" inputmode="tel" placeholder="+375 (29) 123-45-67" autocomplete="tel">
+          </div>
+          <div class="field">
+            <label for="reg-email">Email</label>
+            <input id="reg-email" name="email" type="email" placeholder="anna@example.by" autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="reg-password">Пароль</label>
+            <input id="reg-password" name="password" type="password" autocomplete="new-password">
+            <small class="hint">Минимум 6 символов</small>
+          </div>
+          <p class="msg" role="alert"></p>
+          <button class="btn btn--primary btn--lg btn--block" type="submit">Создать аккаунт</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="cabinet" hidden>
+      <div class="cabinet__head">
+        <div>
+          <p class="eyebrow">Личный кабинет</p>
+          <h1 class="cabinet__title" id="user-name"></h1>
+        </div>
+        <button class="btn btn--outline btn--lg" id="logout-btn" type="button">Выйти</button>
+      </div>
+
+      <div class="cabinet__grid">
+        <div class="panel">
+          <h2>Мои питомцы</h2>
+          <ul class="pets" id="pets-list"></ul>
+
+          <form class="stack pet-form" id="pet-form" novalidate>
+            <div class="field">
+              <label for="pet-name">Кличка</label>
+              <input id="pet-name" name="name" type="text" placeholder="Бадди">
+            </div>
+            <div class="field">
+              <label for="pet-species">Вид</label>
+              <select id="pet-species" name="species">
+                <option value="dog">Собака</option>
+                <option value="cat">Кошка</option>
+                <option value="rodent">Грызун</option>
+                <option value="bird">Птица</option>
+                <option value="other">Другое</option>
+              </select>
+            </div>
+            <p class="msg" role="alert"></p>
+            <button class="btn btn--primary btn--lg btn--block" type="submit">Добавить питомца</button>
+          </form>
+        </div>
+
+        <div class="panel">
+          <h2>История записей</h2>
+          <div id="appointments-list"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="account.js"></script>
+</body>
+</html>
