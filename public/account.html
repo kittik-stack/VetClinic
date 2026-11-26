@@ -109,6 +109,26 @@
           <h2>История записей</h2>
           <div id="appointments-list"></div>
         </div>
+        <div class="panel panel--wide">
+  <h2>Записаться на приём</h2>
+  <form class="stack" id="book-form" novalidate>
+    <div class="field">
+      <label for="b-pet">Питомец</label>
+      <select id="b-pet" name="pet_id"></select>
+    </div>
+    <div class="field">
+      <label for="b-service">Услуга</label>
+      <select id="b-service" name="service_id"></select>
+    </div>
+    <div class="field">
+      <label for="b-slot">Время</label>
+      <select id="b-slot" name="slot_id" disabled></select>
+    </div>
+    <p class="msg" role="alert"></p>
+    <button class="btn btn--primary btn--lg btn--block" type="submit">Записаться</button>
+  </form>
+</div>
+
       </div>
     </section>
 

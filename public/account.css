@@ -89,3 +89,12 @@
   .auth__card { padding: var(--sp-4); }
   .cabinet__grid { grid-template-columns: 1fr 1.4fr; align-items: start; }
 }
+
+.panel--wide { grid-column: 1 / -1; }
+.msg.is-ok { color: var(--c-success); }
+
+
+.pet__del { margin-left: auto; padding: 6px 14px; border: 1px solid var(--c-border); border-radius: var(--r-pill); background: transparent; color: var(--c-error); font: 600 13px 'Inter', sans-serif; cursor: pointer; }
+.pet__del:hover { border-color: var(--c-error); }
+.pet__del:disabled { opacity: .5; cursor: default; }
+
